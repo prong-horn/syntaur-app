@@ -276,7 +276,6 @@ Global configuration for the Syntaur CLI.
   dashboardServer = createDashboardServer({
     port: serverPort,
     missionsDir,
-    assignmentsDir: assignmentsDir(),
     serversDir: serversDir(),
     playbooksDir: playbooksDir(),
     todosDir: todosDir(),
