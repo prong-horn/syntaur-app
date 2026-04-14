@@ -17,7 +17,7 @@
     "url": "git+https://github.com/prong-horn/syntaur-app.git"
   },
   "dependencies": {
-    "syntaur": "file:../syntaur",
+    "syntaur": "file:syntaur-0.1.8.tgz",
     "update-electron-app": "^3.0.0"
   },
   "devDependencies": {
