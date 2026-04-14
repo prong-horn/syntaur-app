@@ -10,7 +10,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "tsc --noEmit",
-    "postinstall": "electron-rebuild"
+    "postinstall": "electron-rebuild && find node_modules -name '*.node' -exec codesign --force --sign - {} +"
   },
   "repository": {
     "type": "git",
