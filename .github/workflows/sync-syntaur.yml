@@ -38,15 +38,22 @@ jobs:
         run: npm install "syntaur@${{ steps.version.outputs.version }}" --save-exact --ignore-scripts
 
       - name: Mirror app version
-        run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version
+        run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version --allow-same-version
 
       - name: Commit and tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit — already at v${{ steps.version.outputs.version }}"
+            exit 0
+          fi
           git commit -m "chore: sync syntaur v${{ steps.version.outputs.version }}"
           git tag "v${{ steps.version.outputs.version }}"
+          echo "push=true" >> "$GITHUB_OUTPUT"
+        id: commit
 
       - name: Push changes and tag
+        if: steps.commit.outputs.push == 'true'
         run: git push origin main --follow-tags
