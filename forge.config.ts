@@ -3,6 +3,9 @@ import { VitePlugin } from '@electron-forge/plugin-vite';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDMG } from '@electron-forge/maker-dmg';
+import { cpSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+import { execSync } from 'node:child_process';
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -50,6 +53,30 @@ const config: ForgeConfig = {
       ['win32'],
     ),
   ],
+  hooks: {
+    packageAfterCopy: async (_config, buildPath) => {
+      // @electron-forge/plugin-vite excludes node_modules (it expects Vite to
+      // bundle everything). syntaur is marked external because its server
+      // resolves static assets relative to its package directory at runtime, so
+      // we copy the full package and all its transitive dependencies manually.
+      const nmSrc = resolve(__dirname, 'node_modules');
+      const nmDest = join(buildPath, 'node_modules');
+
+      // Get every production dependency path from npm
+      const lsOutput = execSync('npm ls --all --prod --parseable', {
+        cwd: __dirname,
+        encoding: 'utf-8',
+      });
+      for (const line of lsOutput.trim().split('\n')) {
+        if (!line.includes('node_modules')) continue;
+        // Extract the path relative to the top-level node_modules, preserving
+        // nested node_modules (e.g. "syntaur/node_modules/commander")
+        const rel = line.slice(nmSrc.length + 1);
+        if (!rel) continue;
+        cpSync(join(nmSrc, rel), join(nmDest, rel), { recursive: true });
+      }
+    },
+  },
   plugins: [
     new VitePlugin({
       build: [

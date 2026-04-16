@@ -1,0 +1,52 @@
+name: Sync Syntaur Version
+
+on:
+  repository_dispatch:
+    types: [syntaur-published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Syntaur version to sync (without v prefix)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            VERSION="${{ github.event.client_payload.version }}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update syntaur dependency
+        run: npm install "syntaur@${{ steps.version.outputs.version }}" --save-exact --ignore-scripts
+
+      - name: Mirror app version
+        run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: sync syntaur v${{ steps.version.outputs.version }}"
+          git tag "v${{ steps.version.outputs.version }}"
+
+      - name: Push changes and tag
+        run: git push origin main --follow-tags

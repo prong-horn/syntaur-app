@@ -1,23 +1,28 @@
 {
   "name": "syntaur-app",
   "productName": "Syntaur",
-  "version": "0.1.0",
+  "version": "0.1.13",
   "description": "Syntaur Desktop - Mission workflow dashboard",
   "main": ".vite/build/main.js",
   "scripts": {
+    "sync:syntaur-dashboard": "node ./scripts/sync-syntaur-dashboard.mjs",
+    "prestart": "npm run sync:syntaur-dashboard",
     "start": "electron-forge start",
+    "prepackage": "npm run sync:syntaur-dashboard",
     "package": "electron-forge package",
+    "premake": "npm run sync:syntaur-dashboard",
     "make": "electron-forge make",
+    "prepublish": "npm run sync:syntaur-dashboard",
     "publish": "electron-forge publish",
     "lint": "tsc --noEmit",
-    "postinstall": "electron-rebuild && find node_modules -name '*.node' -exec codesign --force --sign - {} +"
+    "postinstall": "npm run sync:syntaur-dashboard && electron-rebuild && find node_modules -name '*.node' -exec codesign --force --sign - {} +"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/prong-horn/syntaur-app.git"
   },
   "dependencies": {
-    "syntaur": "file:syntaur-0.1.8.tgz",
+    "syntaur": "0.1.13",
     "update-electron-app": "^3.0.0"
   },
   "devDependencies": {
