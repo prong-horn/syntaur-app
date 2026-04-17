@@ -31,6 +31,12 @@ jobs:
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: npm run make
 
+      - name: Copy to version-less filenames
+        shell: pwsh
+        run: |
+          Copy-Item (Get-ChildItem -Path out/make -Filter "*.exe" -Recurse | Select-Object -First 1).FullName -Destination "out/make/Syntaur-Setup.exe"
+          Copy-Item (Get-ChildItem -Path out/make -Filter "*.zip" -Recurse | Select-Object -First 1).FullName -Destination "out/make/Syntaur-win32-x64.zip"
+
       - name: Upload artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -39,5 +45,7 @@ jobs:
             out/make/**/*.nupkg
             out/make/**/RELEASES
             out/make/**/*.zip
+            out/make/Syntaur-Setup.exe
+            out/make/Syntaur-win32-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

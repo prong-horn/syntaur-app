@@ -11,7 +11,15 @@ permissions:
 
 jobs:
   build-mac:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-latest
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,7 +53,12 @@ jobs:
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
-        run: npm run make
+        run: npm run make -- --arch=${{ matrix.arch }}
+
+      - name: Copy to version-less filenames
+        run: |
+          cp out/make/*.dmg "out/make/Syntaur-${{ matrix.arch }}.dmg"
+          cp out/make/zip/darwin/${{ matrix.arch }}/*.zip "out/make/Syntaur-darwin-${{ matrix.arch }}.zip"
 
       - name: Upload artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -53,5 +66,7 @@ jobs:
           files: |
             out/make/**/*.dmg
             out/make/**/*.zip
+            out/make/Syntaur-${{ matrix.arch }}.dmg
+            out/make/Syntaur-darwin-${{ matrix.arch }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
