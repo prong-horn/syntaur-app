@@ -37,6 +37,7 @@
     "typescript": "^5.7.0",
     "vite": "^6.0.0"
   },
+  "author": "Prong Horn",
   "engines": {
     "node": ">=20.0.0"
   }
