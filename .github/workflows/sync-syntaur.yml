@@ -50,7 +50,7 @@ jobs:
             exit 0
           fi
           git commit -m "chore: sync syntaur v${{ steps.version.outputs.version }}"
-          git tag "v${{ steps.version.outputs.version }}"
+          git tag -a "v${{ steps.version.outputs.version }}" -m "v${{ steps.version.outputs.version }}"
           echo "push=true" >> "$GITHUB_OUTPUT"
         id: commit
 
