@@ -34,6 +34,7 @@ jobs:
         run: npm ci
 
       - name: Import code signing certificate
+        if: env.MAC_CERTIFICATE != ''
         env:
           MAC_CERTIFICATE: ${{ secrets.MAC_CERTIFICATE }}
           MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
