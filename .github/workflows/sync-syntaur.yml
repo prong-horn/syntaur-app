@@ -34,6 +34,22 @@ jobs:
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Wait for npm registry to index version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ATTEMPTS=20
+          INTERVAL=6
+          for i in $(seq 1 $ATTEMPTS); do
+            if npm view "syntaur@$VERSION" version >/dev/null 2>&1; then
+              echo "syntaur@$VERSION is live on the registry (attempt $i)."
+              exit 0
+            fi
+            echo "Attempt $i/$ATTEMPTS: syntaur@$VERSION not yet on registry; sleeping ${INTERVAL}s..."
+            sleep "$INTERVAL"
+          done
+          echo "ERROR: syntaur@$VERSION never appeared on the registry after $((ATTEMPTS * INTERVAL))s." >&2
+          exit 1
+
       - name: Update syntaur dependency
         run: npm install "syntaur@${{ steps.version.outputs.version }}" --save-exact --ignore-scripts
 
