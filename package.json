@@ -1,7 +1,7 @@
 {
   "name": "syntaur-app",
   "productName": "Syntaur",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "Syntaur Desktop - Mission workflow dashboard",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "url": "git+https://github.com/prong-horn/syntaur-app.git"
   },
   "dependencies": {
-    "syntaur": "0.5.3",
+    "syntaur": "0.6.0",
     "update-electron-app": "^3.0.0"
   },
   "devDependencies": {
